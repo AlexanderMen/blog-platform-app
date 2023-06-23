@@ -1,0 +1,129 @@
+.fullArticle {
+	min-height: 870px;
+	margin: 0 auto 26px;
+	padding: 0;
+	background-color: #FFFFFF;
+	max-width: 941px;
+	filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.15));
+	font-family: 'Inter', sans-serif;
+}
+
+.spinner {
+	display: block;
+	margin-bottom: 26px;
+}
+
+.fullArticle__colsWrapper {
+	display: flex;
+	justify-content: space-between;
+}
+
+.fullArticle__col_left {
+	margin: 15px 85px 24px 19px;
+}
+
+.fullArticle__col_right {
+	min-width: 155px;
+	display: flex;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	margin: 15px 14px 0 0;
+}
+
+.fullArticle__header {
+	margin: 0 0 7px 0;
+	font-size: 20px;
+	font-weight: normal;
+	line-height: 28px;
+	color: #1890FF;
+}
+
+.fullArticle__like {
+	font-size: 16px;
+	color: #000;
+	margin-left: 10px;
+	cursor: pointer;
+}
+
+.fullArticle__like_favorited {
+	color: red;
+}
+
+.fullArticle__likesCount {
+	font-size: 12px;
+	line-height: 22px;
+	color: black;
+	margin-left: 5px;
+	vertical-align: middle;
+}
+
+.fullArticle__tag {
+	color: rgba(0, 0, 0, 0.5);
+	border-color: rgba(0, 0, 0, 0.5);
+	margin-bottom: 19px;
+}
+
+.fullArticle__description {
+	font-size: 12px;
+	line-height: 22px;
+	color: rgba(0, 0, 0, 0.5);
+}
+
+.fullArticle__userNameAndDateWrap {
+	display: flex;
+	flex-direction: column;
+	margin-right: 12px;
+}
+
+.fullArticle__userName {
+	align-self: flex-end;
+	font-size: 18px;
+	line-height: 24px;
+}
+
+.fullArticle__date {
+	align-self: flex-end;
+	font-size: 12px;
+	line-height: 18px;
+	color: rgba(0, 0, 0, 0.5);
+}
+
+.fullArticle__buttonsWrapper {
+	flex-basis: 100%;
+	text-align: end;
+}
+
+.fullArticle__button {
+	font-size: 14px;
+	line-height: 22px;
+}
+
+.fullArticle__button_red {
+	margin-right: 12px;
+	padding: 3px 17px;
+	color: #F5222D;
+	background-color: #FFF;
+	border: 1px solid #F5222D;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.fullArticle__button_green {
+	vertical-align: middle;
+	padding: 6px 19px;
+	color: #52C41A;
+	border: 1px solid #52C41A;
+	border-radius: 5px;
+	text-decoration: none;
+}
+
+.fullArticle__body {
+	margin: 0 19px;
+	color: rgba(0, 0, 0, 0.75);
+	font-size: 14px;
+}
+
+.fullArticle__body p {
+	margin: 0;
+}
+

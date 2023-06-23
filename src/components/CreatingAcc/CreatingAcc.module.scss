@@ -1,0 +1,132 @@
+.creatingAcc {
+	max-width: 384px;
+	margin: 59px auto 26px;
+	background-color: #FFFFFF;
+	border: 1px solid #D9D9D9;
+	border-radius: 6px;
+	filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.15));
+	font-family: 'Roboto', sans-serif;
+	font-weight: 400;
+	font-style: normal;
+	color: #262626;
+}
+
+.creatingAcc__header {
+	margin: 48px 0 21px;
+	font-weight: 500;
+	font-size: 20px;
+	line-height: 28px;
+	text-align: center;
+}
+
+.creatingAcc__label {
+	display: flex;
+	flex-direction: column;
+	margin: 0 32px 12px 32px;
+	font-style: normal;
+}
+
+.creatingAcc__labelText {
+	font-size: 14px;
+}
+
+.creatingAcc__input {
+	margin-top: 3px;
+	padding: 8px 12px;
+	font-size: 16px;
+	line-height: 24px;
+	border: 1px solid #D9D9D9;
+	border-radius: 4px;
+}
+
+.creatingAcc__input::placeholder {
+	color: #D9D9D9;
+}
+
+.creatingAcc__input::-webkit-input-placeholder {
+	color: #D9D9D9;
+}
+
+.creatingAcc__input::-ms-input-placeholder {
+	color: #D9D9D9;
+}
+
+.creatingAcc__input:-moz-placeholder {
+	color: #D9D9D9;
+	opacity: 1;
+}
+
+.creatingAcc__input::-moz-placeholder {
+	color: #D9D9D9;
+	opacity: 1;
+}
+
+.creatingAcc__input:-ms-input-placeholder {
+	color: #D9D9D9;
+}
+
+.creatingAcc__inputErr {
+	color: #F5222D;
+	font-size: 14px;
+	line-height: 22px;
+	margin-top: 2px;
+}
+
+.creatingAcc__checkboxLabel {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 21px 32px;
+	padding-top: 8px;
+	border-top: 1px solid #E8E8E8;
+}
+
+.creatingAcc__checkboxInputWrap {
+	display: flex;
+	align-items: flex-start;
+}
+
+.creatingAcc__inputCheckbox {
+	margin: 5px 8px 0  0;
+}
+
+.creatingAcc__checkboxLabelText {
+	font-size: 14px;
+	line-height: 22px;
+	color: #595959;
+}
+
+.creatingAcc__btnWrapper {
+	text-align: center;
+	margin-bottom: 8px;
+}
+
+.creatingAcc__btn {
+	padding: 8px 140px;
+	background: #1890FF;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 24px;
+	color: #FFFFFF;
+}
+
+.creatingAcc__footer {
+	text-align: center;
+	margin-bottom: 48px;
+	font-size: 12px;
+	line-height: 20px;
+}
+
+.creatingAcc__footerSpan {
+	color: #8C8C8C;
+}
+
+.creatingAcc__footerLink {
+	color: rgba(24, 144, 255, 1);
+	text-decoration: none;
+}
+
+.creatingAcc__footerLink:visited {
+	color: rgba(24, 144, 255, 1);
+}

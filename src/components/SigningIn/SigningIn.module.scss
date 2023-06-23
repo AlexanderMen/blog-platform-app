@@ -1,0 +1,109 @@
+.signingIn {
+	max-width: 384px;
+	margin: 59px auto 26px;
+	background-color: #FFFFFF;
+	border: 1px solid #D9D9D9;
+	border-radius: 6px;
+	filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.15));
+	font-family: 'Roboto', sans-serif;
+	font-weight: 400;
+	font-style: normal;
+	color: #262626;
+}
+
+.signingIn__header {
+	margin: 48px 0 21px;
+	font-weight: 500;
+	font-size: 20px;
+	line-height: 28px;
+	text-align: center;
+}
+
+.signingIn__label {
+	display: flex;
+	flex-direction: column;
+	margin: 0 32px 12px 32px;
+	font-style: normal;
+}
+
+.signingIn__labelText {
+	font-size: 14px;
+}
+
+.signingIn__input {
+	margin-top: 3px;
+	padding: 8px 12px;
+	font-size: 16px;
+	line-height: 24px;
+	border: 1px solid #D9D9D9;
+	border-radius: 4px;
+}
+
+.signingIn__input::placeholder {
+	color: #D9D9D9;
+}
+
+.signingIn__input::-webkit-input-placeholder {
+	color: #D9D9D9;
+}
+
+.signingIn__input::-ms-input-placeholder {
+	color: #D9D9D9;
+}
+
+.signingIn__input:-moz-placeholder {
+	color: #D9D9D9;
+	opacity: 1;
+}
+
+.signingIn__input::-moz-placeholder {
+	color: #D9D9D9;
+	opacity: 1;
+}
+
+.signingIn__input:-ms-input-placeholder {
+	color: #D9D9D9;
+}
+
+.signingIn__inputErr {
+	color: #F5222D;
+	font-size: 14px;
+	line-height: 22px;
+	margin-top: 2px;
+}
+
+.signingIn__btnWrapper {
+	text-align: center;
+	margin: 21px 0 8px;
+}
+
+.signingIn__btn {
+	padding: 8px 140px;
+	background: #1890FF;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 24px;
+	color: #FFFFFF;
+}
+
+.signingIn__footer {
+	text-align: center;
+	margin-bottom: 48px;
+	font-size: 12px;
+	line-height: 20px;
+}
+
+.signingIn__footerSpan {
+	color: #8C8C8C;
+}
+
+.signingIn__footerLink {
+	color: rgba(24, 144, 255, 1);
+	text-decoration: none;
+}
+
+.signingIn__footerLink:visited {
+	color: rgba(24, 144, 255, 1);
+}

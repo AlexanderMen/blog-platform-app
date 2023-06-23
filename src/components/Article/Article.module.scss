@@ -1,0 +1,85 @@
+.article {
+	display: flex;
+	justify-content: space-between;
+	margin: 0 auto 26px;
+	background-color: #FFFFFF;
+	max-width: 941px;
+	border-radius: 5px;
+	filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.15));
+	font-family: 'Inter', sans-serif;
+}
+
+.article__col_left {
+	margin: 15px 85px 24px 19px;
+}
+
+.article__col_right {
+	min-width: 155px;
+	display: flex;
+	justify-content: flex-end;
+	margin: 15px 14px 0 0;
+}
+
+.article__header {
+	margin: 0 0 7px 0;
+	font-size: 20px;
+	line-height: 28px;
+	color: #1890FF;
+}
+
+.article__headerLink {
+	text-decoration: none;
+	font-weight: normal;
+	color: #1890FF;
+}
+
+.article__headerLink:visited {
+	color: #1890FF;
+}
+
+.article__like {
+	font-size: 16px;
+	color: black;
+	margin-left: 10px;
+}
+
+.article__like_favorited {
+	color: red;
+}
+
+.article__likesCount {
+	font-size: 12px;
+	line-height: 22px;
+	color: black;
+	margin-left: 5px;
+	vertical-align: middle;
+}
+
+.article__tag {
+	border-color: black;
+	margin-bottom: 7px;
+}
+
+.article__description {
+	font-size: 12px;
+	line-height: 22px;
+}
+
+.article__userNameAndDateWrap {
+	display: flex;
+	flex-direction: column;
+	margin-right: 12px;
+}
+
+.article__userName {
+	align-self: flex-end;
+	font-size: 18px;
+	line-height: 24px;
+}
+
+.article__date {
+	align-self: flex-end;
+	font-size: 12px;
+	line-height: 18px;
+	color: rgba(0, 0, 0, 0.5);
+}
