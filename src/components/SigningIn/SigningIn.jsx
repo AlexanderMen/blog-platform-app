@@ -3,17 +3,23 @@ import { connect } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 
-import { validateForm, sendForm, SIGN_IN } from '../../actions';
-import { createLocalStorage } from '../App';
+import {
+	validateSigningInForm,
+	sendSigningInForm,
+	ARTICLES_ROUTE,
+	SIGNING_UP_ROUTE,
+	USER_EMAIL_VALIDATION,
+} from '../../actions';
+import BlogPlatformService from '../../services/BlogPlatformService';
 
 import classes from './SigningIn.module.scss';
 
-const SigningIn = ({ page, signingIn, validateForm, sendForm }) => {
+const SigningIn = ({ page, signingIn, validateSigningInForm, sendSigningInForm }) => {
 	const { userEmail, password, errs } = signingIn;
+	const { createLocalStorage } = new BlogPlatformService();
 	const navigate = useNavigate();
 	const location = useLocation();
-
-	const goTo = location.state?.from?.pathname || '/articles/';
+	const goTo = location.state?.from?.pathname || ARTICLES_ROUTE;
 
 	const {
 		register,
@@ -32,10 +38,10 @@ const SigningIn = ({ page, signingIn, validateForm, sendForm }) => {
 			},
 		};
 		reset();
-		sendForm(SIGN_IN, 'users/login', values, 'POST', page, navigate, goTo, createLocalStorage, null);
+		sendSigningInForm(values, page, navigate, goTo, createLocalStorage);
 	};
 
-	const onInputChange = (evt) => validateForm({ [evt.target.id]: evt.target.value }, SIGN_IN);
+	const onInputChange = (evt) => validateSigningInForm({ [evt.target.id]: evt.target.value });
 
 	return (
 		<form className={classes.signingIn} onSubmit={handleSubmit(formSubmit)}>
@@ -46,13 +52,7 @@ const SigningIn = ({ page, signingIn, validateForm, sendForm }) => {
 					className={classes.signingIn__input}
 					type="email"
 					id="userEmail"
-					{...register('userEmail', {
-						required: 'This field is required.',
-						pattern: {
-							value: /^[a-z\d]{2,}@[a-z]{2,}\.[a-z]{2,}$/,
-							message: 'You should use correct email address.',
-						},
-					})}
+					{...register('userEmail', USER_EMAIL_VALIDATION)}
 					placeholder="Email address"
 					value={userEmail}
 					onChange={(evt) => onInputChange(evt)}
@@ -80,7 +80,7 @@ const SigningIn = ({ page, signingIn, validateForm, sendForm }) => {
 			<footer className={classes.signingIn__footer}>
 				<span className={classes.signingIn__footerSpan}>
 					Don’t have an account?
-					<Link to="/sign-up/" className={classes.signingIn__footerLink}>
+					<Link to={SIGNING_UP_ROUTE} className={classes.signingIn__footerLink}>
 						{} Sign Up
 					</Link>
 					.
@@ -95,4 +95,4 @@ const mapStateToProps = ({ changingPage, signingIn }) => ({
 	page: changingPage.page,
 });
 
-export default connect(mapStateToProps, { validateForm, sendForm })(SigningIn);
+export default connect(mapStateToProps, { validateSigningInForm, sendSigningInForm })(SigningIn);

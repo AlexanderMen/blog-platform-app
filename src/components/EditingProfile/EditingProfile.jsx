@@ -3,15 +3,28 @@ import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 
-import { validateForm, sendForm, EDIT_PROFILE } from '../../actions';
-import { createLocalStorage } from '../App';
+import {
+	validateEditingProfileForm,
+	sendEditingProfileForm,
+	ARTICLES_ROUTE,
+	USER_EMAIL_VALIDATION,
+	USER_PASSWORD_VALIDATION,
+} from '../../actions';
+import BlogPlatformService from '../../services/BlogPlatformService';
 
 import classes from './EditingProfile.module.scss';
 
-const EditingProfile = ({ editingProfile, gettingFormResponse, validateForm, sendForm }) => {
+const EditingProfile = ({
+	editingProfile,
+	gettingFormResponse,
+	validateEditingProfileForm,
+	sendEditingProfileForm,
+}) => {
 	const { userName, userEmail, newPassword, avatarImg, errs } = editingProfile;
 	let { username: name, email, token } = gettingFormResponse;
-	const loggedIn = localStorage.getItem('loggedIn');
+	const { createLocalStorage, getItemFromLocalStorage } = new BlogPlatformService();
+	const loggedIn = getItemFromLocalStorage('loggedIn');
+
 	if (!name && loggedIn) {
 		const loggedInValues = JSON.parse(loggedIn);
 		name = loggedInValues.username;
@@ -20,7 +33,7 @@ const EditingProfile = ({ editingProfile, gettingFormResponse, validateForm, sen
 	}
 
 	useEffect(() => {
-		if (name && email) validateForm({ userName: name, userEmail: email }, EDIT_PROFILE);
+		if (name && email) validateEditingProfileForm({ userName: name, userEmail: email });
 	}, []);
 	const navigate = useNavigate();
 
@@ -47,10 +60,10 @@ const EditingProfile = ({ editingProfile, gettingFormResponse, validateForm, sen
 		if (newPassword) values.user.password = newPassword;
 		if (avatarImg) values.user.image = avatarImg;
 		reset();
-		sendForm(EDIT_PROFILE, 'user', values, 'PUT', 1, navigate, '/articles/', createLocalStorage, null, token);
+		sendEditingProfileForm(values, 1, navigate, ARTICLES_ROUTE, createLocalStorage, token);
 	};
 
-	const onInputChange = (evt) => validateForm({ [evt.target.id]: evt.target.value }, EDIT_PROFILE);
+	const onInputChange = (evt) => validateEditingProfileForm({ [evt.target.id]: evt.target.value });
 
 	return (
 		<form className={classes.editingProfile} onSubmit={handleSubmit(formSubmit)}>
@@ -75,13 +88,7 @@ const EditingProfile = ({ editingProfile, gettingFormResponse, validateForm, sen
 					className={classes.editingProfile__input}
 					type="email"
 					id="userEmail"
-					{...register('userEmail', {
-						required: 'This field is required.',
-						pattern: {
-							value: /^[a-z\d]{2,}@[a-z]{2,}\.[a-z]{2,}$/,
-							message: 'You should use correct email address.',
-						},
-					})}
+					{...register('userEmail', USER_EMAIL_VALIDATION)}
 					placeholder="Email address"
 					value={userEmail}
 					onChange={(evt) => onInputChange(evt)}
@@ -95,14 +102,7 @@ const EditingProfile = ({ editingProfile, gettingFormResponse, validateForm, sen
 					className={classes.editingProfile__input}
 					type="password"
 					id="newPassword"
-					{...register('newPassword', {
-						minLength: { value: 6, message: 'Your password needs to be at least 6 characters.' },
-						maxLength: { value: 40, message: 'Your password needs to be no longer than 40 characters.' },
-						pattern: {
-							value: /^[a-zA-Z]\w*$/,
-							message: 'The first character must be an English letter, followed by numbers or English letters.',
-						},
-					})}
+					{...register('newPassword', USER_PASSWORD_VALIDATION)}
 					placeholder="New password"
 					value={newPassword}
 					onChange={(evt) => onInputChange(evt)}
@@ -136,4 +136,4 @@ const EditingProfile = ({ editingProfile, gettingFormResponse, validateForm, sen
 
 const mapStateToProps = ({ editingProfile, gettingFormResponse }) => ({ editingProfile, gettingFormResponse });
 
-export default connect(mapStateToProps, { validateForm, sendForm })(EditingProfile);
+export default connect(mapStateToProps, { validateEditingProfileForm, sendEditingProfileForm })(EditingProfile);

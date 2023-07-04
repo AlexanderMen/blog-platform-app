@@ -4,6 +4,8 @@ import { Avatar, Tag } from 'antd';
 import { HeartOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
 
+import { ARTICLES_ROUTE, NO_PHOTO } from '../../actions';
+
 import classes from './Article.module.scss';
 
 const Article = ({ title, slug, favorited, favoritesCount, description, tagList, author, createdAt }) => {
@@ -20,7 +22,7 @@ const Article = ({ title, slug, favorited, favoritesCount, description, tagList,
 		<li className={`${classes.article} ${classes.articlesList__item}`}>
 			<div className={classes.article__col_left}>
 				<h1 className={classes.article__header}>
-					<Link to={`/articles/${slug}`} className={classes.article__headerLink}>
+					<Link to={`${ARTICLES_ROUTE}${slug}`} className={classes.article__headerLink}>
 						{title}
 					</Link>{' '}
 					<HeartOutlined className={`${classes.article__like} ${favoriteClass}`} />
@@ -34,7 +36,7 @@ const Article = ({ title, slug, favorited, favoritesCount, description, tagList,
 					<div className={classes.article__userName}>{username}</div>
 					<div className={classes.article__date}>{creationDate}</div>
 				</div>
-				<Avatar size={44} src={image || '../images/noPhoto.png'} />
+				<Avatar size={44} src={image || NO_PHOTO} />
 			</div>
 		</li>
 	);

@@ -1,11 +1,15 @@
 import React from 'react';
 import { useLocation, Navigate } from 'react-router-dom';
 
-const RequireAuth = ({ children }) => {
-	const location = useLocation();
-	const loggedIn = localStorage.getItem('loggedIn');
+import { SIGNING_IN_ROUTE } from '../../actions';
+import BlogPlatformService from '../../services/BlogPlatformService';
 
-	if (!loggedIn) return <Navigate to="/sign-in/" state={{ from: location }} />;
+const RequireAuth = ({ children }) => {
+	const { getItemFromLocalStorage } = new BlogPlatformService();
+	const location = useLocation();
+	const loggedIn = getItemFromLocalStorage('loggedIn');
+
+	if (!loggedIn) return <Navigate to={SIGNING_IN_ROUTE} state={{ from: location }} />;
 	return children;
 };
 

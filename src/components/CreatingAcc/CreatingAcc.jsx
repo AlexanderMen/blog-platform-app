@@ -3,17 +3,25 @@ import { connect } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 
-import { validateForm, sendForm, CREATE_ACC } from '../../actions';
-import { createLocalStorage } from '../App';
+import {
+	validateCreatingAccForm,
+	sendCreatingAccForm,
+	ARTICLES_ROUTE,
+	SIGNING_IN_ROUTE,
+	USER_EMAIL_VALIDATION,
+	USER_PASSWORD_VALIDATION,
+} from '../../actions';
+import BlogPlatformService from '../../services/BlogPlatformService';
 
 import classes from './CreatingAcc.module.scss';
 
-const CreatingAcc = ({ page, creatingAcc, validateForm, sendForm }) => {
+const CreatingAcc = ({ page, creatingAcc, validateCreatingAccForm, sendCreatingAccForm }) => {
 	const { userName, userEmail, password, repeatPassword, checkbox, errs } = creatingAcc;
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { createLocalStorage } = new BlogPlatformService();
 
-	const goTo = location.state?.from?.pathname || '/articles/';
+	const goTo = location.state?.from?.pathname || ARTICLES_ROUTE;
 
 	const {
 		register,
@@ -33,14 +41,14 @@ const CreatingAcc = ({ page, creatingAcc, validateForm, sendForm }) => {
 			},
 		};
 		reset();
-		sendForm(CREATE_ACC, 'users', values, 'POST', page, navigate, goTo, createLocalStorage, null);
+		sendCreatingAccForm(values, page, navigate, goTo, createLocalStorage);
 	};
 
 	const onInputChange = (evt) => {
 		const id = evt.target.id;
 		let value = evt.target.value;
 		if (id === 'checkbox') value = evt.target.checked;
-		validateForm({ [id]: value }, CREATE_ACC);
+		validateCreatingAccForm({ [id]: value });
 	};
 
 	return (
@@ -75,13 +83,7 @@ const CreatingAcc = ({ page, creatingAcc, validateForm, sendForm }) => {
 					className={classes.creatingAcc__input}
 					type="email"
 					id="userEmail"
-					{...register('userEmail', {
-						required: 'This field is required.',
-						pattern: {
-							value: /^[a-z\d]{2,}@[a-z]{2,}\.[a-z]{2,}$/,
-							message: 'You should use correct email address.',
-						},
-					})}
+					{...register('userEmail', USER_EMAIL_VALIDATION)}
 					placeholder="Email address"
 					value={userEmail}
 					onChange={(evt) => onInputChange(evt)}
@@ -95,15 +97,7 @@ const CreatingAcc = ({ page, creatingAcc, validateForm, sendForm }) => {
 					className={classes.creatingAcc__input}
 					type="password"
 					id="password"
-					{...register('password', {
-						required: 'This field is required.',
-						minLength: { value: 6, message: 'Your password needs to be at least 6 characters.' },
-						maxLength: { value: 40, message: 'Your password needs to be no longer than 40 characters.' },
-						pattern: {
-							value: /^[a-zA-Z]\w*$/,
-							message: 'The first character must be an English letter, followed by numbers or English letters.',
-						},
-					})}
+					{...register('password', { ...USER_PASSWORD_VALIDATION, required: 'This field is required.' })}
 					placeholder="Password"
 					value={password}
 					onChange={(evt) => onInputChange(evt)}
@@ -150,7 +144,7 @@ const CreatingAcc = ({ page, creatingAcc, validateForm, sendForm }) => {
 			<footer className={classes.creatingAcc__footer}>
 				<span className={classes.creatingAcc__footerSpan}>
 					Already have an account?
-					<Link to="/sign-in/" className={classes.creatingAcc__footerLink}>
+					<Link to={SIGNING_IN_ROUTE} className={classes.creatingAcc__footerLink}>
 						{} Sign In
 					</Link>
 					.
@@ -165,4 +159,4 @@ const mapStateToProps = ({ changingPage, creatingAcc }) => ({
 	page: changingPage.page,
 });
 
-export default connect(mapStateToProps, { validateForm, sendForm })(CreatingAcc);
+export default connect(mapStateToProps, { validateCreatingAccForm, sendCreatingAccForm })(CreatingAcc);

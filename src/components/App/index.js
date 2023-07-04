@@ -1,4 +1,3 @@
-import App, { createLocalStorage } from './App';
+import App from './App';
 
 export default App;
-export { createLocalStorage };

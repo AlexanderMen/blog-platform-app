@@ -4,15 +4,30 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Col, Row } from 'antd';
 
-import { fetchFullArticle, validateForm, sendForm, CREATE_ARTICLE } from '../../actions';
-import { createLocalStorage } from '../App';
+import {
+	fetchFullArticle,
+	validateNewArticleForm,
+	sendNewArticleForm,
+	newArticleFieldValidation,
+	ARTICLES_ROUTE,
+} from '../../actions';
+import BlogPlatformService from '../../services/BlogPlatformService';
 
 import classes from './NewArticle.module.scss';
 
-const NewArticle = ({ creatingArticle, fetchFullArticle, page, validateForm, sendForm, article, articles }) => {
+const NewArticle = ({
+	creatingArticle,
+	fetchFullArticle,
+	page,
+	validateNewArticleForm,
+	sendNewArticleForm,
+	article,
+	articles,
+}) => {
 	const { title, shortDescription, text, tags, errs } = creatingArticle;
 	const { slug } = useParams();
 	const navigate = useNavigate();
+	const { getItemFromLocalStorage } = new BlogPlatformService();
 
 	const {
 		register,
@@ -30,15 +45,12 @@ const NewArticle = ({ creatingArticle, fetchFullArticle, page, validateForm, sen
 	});
 
 	const fillingExistingInputs = (article) => {
-		validateForm(
-			{
-				title: article.title,
-				shortDescription: article.description,
-				text: article.body,
-				tags: article.tagList,
-			},
-			CREATE_ARTICLE
-		);
+		validateNewArticleForm({
+			title: article.title,
+			shortDescription: article.description,
+			text: article.body,
+			tags: article.tagList,
+		});
 		append(article.tagList.map((tag) => ({ tag })));
 	};
 
@@ -57,7 +69,7 @@ const NewArticle = ({ creatingArticle, fetchFullArticle, page, validateForm, sen
 	}, [slug]);
 
 	let token;
-	const loggedIn = localStorage.getItem('loggedIn');
+	const loggedIn = getItemFromLocalStorage('loggedIn');
 	if (loggedIn) {
 		const loggedInValues = JSON.parse(loggedIn);
 		token = loggedInValues.token;
@@ -65,10 +77,11 @@ const NewArticle = ({ creatingArticle, fetchFullArticle, page, validateForm, sen
 
 	const formSubmit = () => {
 		let sameTags;
+		let emptyField = null;
 		tags.forEach((tag, index, arr) => {
 			if (arr.includes(tag, index + 1)) sameTags = true;
 		});
-		if (sameTags) return validateForm(null, CREATE_ARTICLE, { tags: 'do not have to be the same' });
+		if (sameTags) return validateNewArticleForm(null, { tags: 'do not have to be the same' });
 
 		const values = {
 			article: {
@@ -78,31 +91,26 @@ const NewArticle = ({ creatingArticle, fetchFullArticle, page, validateForm, sen
 				tagList: tags,
 			},
 		};
-		reset();
-		if (slug)
-			return sendForm(
-				CREATE_ARTICLE,
-				`/articles/${slug}/`,
-				values,
-				'PUT',
-				page,
-				navigate,
-				`/articles/${slug}`,
-				createLocalStorage,
-				slug,
-				token
-			);
 
-		sendForm(CREATE_ARTICLE, 'articles', values, 'POST', page, navigate, '/articles/', createLocalStorage, null, token);
+		for (let field in values.article) {
+			if (!values.article[field]) emptyField = { ...emptyField, [field]: 'field is required.' };
+		}
+
+		if (emptyField) return validateNewArticleForm(null, emptyField);
+
+		reset();
+		if (slug) return sendNewArticleForm(values, 'PUT', page, navigate, `${ARTICLES_ROUTE}${slug}`, slug, token);
+
+		sendNewArticleForm(values, 'POST', page, navigate, ARTICLES_ROUTE, '', token);
 	};
 
 	const onInputChange = (evt) => {
 		const { id, value } = evt.target;
 		if (id.includes('tag')) {
 			tags[id.slice(3)] = value;
-			return validateForm({ tags }, CREATE_ARTICLE);
+			return validateNewArticleForm({ tags });
 		}
-		validateForm({ [id]: value }, CREATE_ARTICLE);
+		validateNewArticleForm({ [id]: value });
 	};
 
 	return (
@@ -114,21 +122,13 @@ const NewArticle = ({ creatingArticle, fetchFullArticle, page, validateForm, sen
 					className={classes.newArticle__input}
 					type="text"
 					id="title"
-					{...register('title', {
-						required: 'This field is required.',
-						minLength: { value: 1, message: 'Your title needs to be at least 1 character.' },
-						maxLength: { value: 5000, message: 'Your title needs to be no longer than 5000 characters.' },
-						pattern: {
-							value: /\S+/,
-							message: 'This field cannot contain only whitespace characters.',
-						},
-					})}
+					{...register('title', newArticleFieldValidation('title', 5000))}
 					placeholder="Title"
 					value={title}
 					onChange={(evt) => onInputChange(evt)}
 				/>
 				{errors.title && <div className={classes.newArticle__inputErr}>{errors.title.message}</div>}
-				{errs?.title && <div className={classes.newArticle__inputErr}>title {errs.title}</div>}
+				{errs?.title && <div className={classes.newArticle__inputErr}>Title {errs.title}</div>}
 			</label>
 			<label className={classes.newArticle__label} htmlFor="shortDescription">
 				<span className={classes.newArticle__labelText}>Short description</span>
@@ -136,15 +136,7 @@ const NewArticle = ({ creatingArticle, fetchFullArticle, page, validateForm, sen
 					className={classes.newArticle__input}
 					type="text"
 					id="shortDescription"
-					{...register('shortDescription', {
-						required: 'This field is required.',
-						minLength: { value: 1, message: 'Your description needs to be at least 1 character.' },
-						maxLength: { value: 5000, message: 'Your description needs to be no longer than 5000 characters.' },
-						pattern: {
-							value: /\S+/,
-							message: 'This field cannot contain only whitespace characters.',
-						},
-					})}
+					{...register('shortDescription', newArticleFieldValidation('description', 5000))}
 					placeholder="Description"
 					value={shortDescription}
 					onChange={(evt) => onInputChange(evt)}
@@ -152,27 +144,20 @@ const NewArticle = ({ creatingArticle, fetchFullArticle, page, validateForm, sen
 				{errors.shortDescription && (
 					<div className={classes.newArticle__inputErr}>{errors.shortDescription.message}</div>
 				)}
-				{errs?.description && <div className={classes.newArticle__inputErr}>description {errs.description}</div>}
+				{errs?.description && <div className={classes.newArticle__inputErr}>Description {errs.description}</div>}
 			</label>
 			<label className={classes.newArticle__label} htmlFor="text">
 				<span className={classes.newArticle__labelText}>Text</span>
 				<textarea
 					className={`${classes.newArticle__input} ${classes.newArticle__inputTextarea}`}
 					id="text"
-					{...register('text', {
-						required: 'This field is required.',
-						minLength: { value: 1, message: 'Your text needs to be at least 1 character.' },
-						pattern: {
-							value: /\S+/,
-							message: 'This field cannot contain only whitespace characters.',
-						},
-					})}
+					{...register('text', newArticleFieldValidation('text'))}
 					placeholder="Text"
 					value={text}
 					onChange={(evt) => onInputChange(evt)}
 				/>
 				{errors.text && <div className={classes.newArticle__inputErr}>{errors.text.message}</div>}
-				{errs?.body && <div className={classes.newArticle__inputErr}>text {errs.body}</div>}
+				{errs?.body && <div className={classes.newArticle__inputErr}>Text {errs.body}</div>}
 			</label>
 			<div className={classes.newArticle__label}>
 				<span className={classes.newArticle__labelText}>Tags</span>
@@ -186,14 +171,9 @@ const NewArticle = ({ creatingArticle, fetchFullArticle, page, validateForm, sen
 										type="text"
 										id={`tag${index}`}
 										{...register(`tags.${index}.tag`, {
+											...newArticleFieldValidation('tag', 50),
 											required:
 												'This field is required. If you do not want to provide the tag, please delete it before sending form',
-											minLength: { value: 1, message: 'Your tag needs to be at least 1 character.' },
-											maxLength: { value: 100, message: 'Your tag needs to be no longer than 100 characters.' },
-											pattern: {
-												value: /\S+/,
-												message: 'This field cannot contain only whitespace characters.',
-											},
 										})}
 										placeholder="Tag"
 										value={tags[index]}
@@ -205,8 +185,8 @@ const NewArticle = ({ creatingArticle, fetchFullArticle, page, validateForm, sen
 										onClick={() => {
 											remove(index);
 											tags.splice(index, 1);
-											if (!tags) return validateForm({ tags: [] }, CREATE_ARTICLE);
-											validateForm({ tags }, CREATE_ARTICLE);
+											if (!tags) return validateNewArticleForm({ tags: [] });
+											validateNewArticleForm({ tags });
 										}}
 									>
 										Delete
@@ -225,8 +205,7 @@ const NewArticle = ({ creatingArticle, fetchFullArticle, page, validateForm, sen
 							className={`${classes.newArticle__btn} ${classes.newArticle__btn_blue}`}
 							onClick={() => {
 								append({ tag: '' });
-								tags.push('');
-								validateForm({ tags }, CREATE_ARTICLE);
+								validateNewArticleForm({ tags: [...tags, ''] });
 							}}
 						>
 							Add tag
@@ -248,4 +227,4 @@ const mapStateToProps = ({ creatingArticle, changingPage, showingArticle }) => (
 	page: changingPage.page,
 });
 
-export default connect(mapStateToProps, { fetchFullArticle, validateForm, sendForm })(NewArticle);
+export default connect(mapStateToProps, { fetchFullArticle, validateNewArticleForm, sendNewArticleForm })(NewArticle);

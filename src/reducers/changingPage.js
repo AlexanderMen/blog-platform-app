@@ -10,11 +10,11 @@ const changingPage = (
 ) => {
 	switch (action.type) {
 		case CHANGE_PAGE: {
-			const { page, articles, articlesCount } = action;
+			const { page, articles, articlesCount, ARTICLES_COUNT_PER_PAGE } = action;
 			return {
 				page,
 				articles: [...articles],
-				totalPages: Math.ceil(articlesCount / 5),
+				totalPages: Math.ceil(articlesCount / ARTICLES_COUNT_PER_PAGE),
 			};
 		}
 		default:

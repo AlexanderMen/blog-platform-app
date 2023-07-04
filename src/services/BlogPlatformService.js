@@ -1,92 +1,157 @@
 export default class BlogPlatformService {
-	async fetchingArticles(dispatch, changePage, page, showErrorMessage, token) {
+	baseURL = 'https://blog.kata.academy/api/';
+
+	createLocalStorage = (key, value) => localStorage.setItem(key, value);
+
+	getItemFromLocalStorage = (item) => localStorage.getItem(item);
+
+	clearLocalStorage = () => localStorage.clear();
+
+	async fetchingArticles(page, token, ARTICLES_COUNT_PER_PAGE) {
 		try {
-			const offset = 5 * (page - 1);
-			const response = await fetch(`https://blog.kata.academy/api/articles?limit=5&offset=${offset}`, {
+			const searchParams = new URLSearchParams('limit=5');
+			const offset = ARTICLES_COUNT_PER_PAGE * (page - 1);
+			searchParams.append('offset', offset);
+			const response = await fetch(`${this.baseURL}articles?${searchParams}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: `Token ${token}`,
 				},
 			});
-			const json = await response.json();
-			return dispatch(changePage(page, json.articles, json.articlesCount));
+			return await response.json();
 		} catch (err) {
-			dispatch(showErrorMessage());
+			return err;
 		}
 	}
 
-	async fetchingFullArticle(dispatch, showArticle, slug, showErrorMessage, token) {
+	async fetchingFullArticle(slug, token) {
 		try {
-			const response = await fetch(`https://blog.kata.academy/api/articles/${slug}`, {
+			const response = await fetch(`${this.baseURL}articles/${slug}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: `Token ${token}`,
 				},
 			});
+			if (response.status === 404) return { notFoundPage: true };
 			const json = await response.json();
-			dispatch(showArticle(json.article));
 			return json.article;
 		} catch (err) {
-			dispatch(showErrorMessage());
+			return err;
 		}
 	}
 
-	async sendingForm(
-		dispatch,
-		actionType,
-		getFormResponse,
-		validateForm,
-		path,
-		values,
-		method,
-		page,
-		navigate,
-		onSuccessSubmit,
-		goTo,
-		showErrorMessage,
-		createLocalStorage,
-		slug,
-		token
-	) {
+	async sendingCreatingAccForm(values) {
 		try {
-			let headers = { Authorization: `Token ${token}` };
-			if (method !== 'DELETE' && !path.includes('favorite'))
-				headers = { ...headers, 'Content-Type': 'application/json' };
-			const response = await fetch(`https://blog.kata.academy/api/${path}`, {
-				method,
-				headers,
+			const response = await fetch(`${this.baseURL}users`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(values),
 			});
-
-			if (method === 'DELETE' && path.includes('favorite'))
-				return onSuccessSubmit(dispatch, page, navigate, goTo, slug, token);
-			if (method === 'DELETE' && response.status) return onSuccessSubmit(dispatch, page, navigate, goTo);
 			const json = await response.json();
-			if (response.status === 422) return dispatch(validateForm(null, actionType, json.errors));
-			onSuccessSubmit(dispatch, page, navigate, goTo, slug, token);
-
-			if (path.includes('articles')) return;
-
-			json.user.password = values.user.password;
-			createLocalStorage('loggedIn', JSON.stringify(json.user));
-			return dispatch(getFormResponse(json.user));
+			if (response.status === 422) return json;
+			return json;
 		} catch (err) {
-			dispatch(showErrorMessage());
+			return err;
 		}
 	}
 
-	async checkingToken(dispatch, token, email, password, showErrorMessage) {
+	async sendingSigningInForm(values) {
 		try {
-			const response = await fetch('https://blog.kata.academy/api/user', {
+			const response = await fetch(`${this.baseURL}users/login`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(values),
+			});
+			const json = await response.json();
+			if (response.status === 422) return json;
+			return json;
+		} catch (err) {
+			return err;
+		}
+	}
+
+	async sendingEditingProfileForm(values, token) {
+		try {
+			const response = await fetch(`${this.baseURL}user`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Token ${token}`,
+				},
+				body: JSON.stringify(values),
+			});
+			const json = await response.json();
+			if (response.status === 422) return json;
+			return json;
+		} catch (err) {
+			return err;
+		}
+	}
+
+	async sendingNewArticleForm(values, method, slug, token) {
+		try {
+			const response = await fetch(`${this.baseURL}articles/${slug}`, {
+				method,
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Token ${token}`,
+				},
+				body: JSON.stringify(values),
+			});
+			const json = await response.json();
+			if (response.status === 422) return json.errors;
+			return 'success';
+		} catch (err) {
+			return err;
+		}
+	}
+
+	async deletingArticle(slug, token) {
+		try {
+			const response = await fetch(`${this.baseURL}articles/${slug}`, {
+				method: 'DELETE',
+				headers: { Authorization: `Token ${token}` },
+			});
+			if (response.status) return;
+		} catch (err) {
+			return err;
+		}
+	}
+
+	async favoritingActicle(slug, token) {
+		try {
+			await fetch(`${this.baseURL}articles/${slug}/favorite/`, {
+				method: 'POST',
+				headers: { Authorization: `Token ${token}` },
+			});
+		} catch (err) {
+			return err;
+		}
+	}
+
+	async unfavoritingActicle(slug, token) {
+		try {
+			await fetch(`${this.baseURL}articles/${slug}/favorite/`, {
+				method: 'DELETE',
+				headers: { Authorization: `Token ${token}` },
+			});
+		} catch (err) {
+			return err;
+		}
+	}
+
+	async checkingToken(token, email, password) {
+		try {
+			const response = await fetch(`${this.baseURL}user`, {
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: `Token ${token}`,
 				},
 			});
 			if (response.status === 401 || response.status === 422) {
-				const response = await fetch('https://blog.kata.academy/api/users/login', {
+				const response = await fetch(`${this.baseURL}users/login`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -103,7 +168,7 @@ export default class BlogPlatformService {
 			}
 			return token;
 		} catch (err) {
-			dispatch(showErrorMessage());
+			return err;
 		}
 	}
 }

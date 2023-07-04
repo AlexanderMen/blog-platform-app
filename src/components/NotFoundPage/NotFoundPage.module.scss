@@ -1,0 +1,22 @@
+.notFoundPage {
+	margin: 59px auto 26px;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 500;
+	font-size: 20px;
+	font-style: normal;
+	color: #262626;
+	text-align: center;
+}
+
+.notFoundPage__link {
+	color: rgba(24, 144, 255, 1);
+	text-decoration: none;
+}
+
+.notFoundPage__link:visited {
+	color: rgba(24, 144, 255, 1);
+}
+
+.notFoundPage__link:hover {
+	color: red;
+}

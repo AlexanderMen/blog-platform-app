@@ -4,11 +4,13 @@ import { Spin, Pagination, ConfigProvider } from 'antd';
 
 import { fetchArticles } from '../../actions';
 import Article from '../Article';
+import BlogPlatformService from '../../services/BlogPlatformService';
 
 import classes from './ArticlesList.module.scss';
 
 const ArticlesList = ({ articles, page, totalPages, error, fetchArticles }) => {
-	const localStoragePage = +localStorage.getItem('page') || page;
+	const { createLocalStorage, getItemFromLocalStorage } = new BlogPlatformService();
+	const localStoragePage = +getItemFromLocalStorage('page') || page;
 
 	const articlesList = articles.map((article) => {
 		const { title, slug, description, tagList, favorited, favoritesCount, author, createdAt } = article;
@@ -51,7 +53,7 @@ const ArticlesList = ({ articles, page, totalPages, error, fetchArticles }) => {
 					<Pagination
 						current={page || localStoragePage}
 						onChange={(page) => {
-							localStorage.setItem('page', page);
+							createLocalStorage('page', page);
 							fetchArticles(page, JSON.parse(localStorage.getItem('loggedIn'))?.token);
 						}}
 						total={totalPages * 10}

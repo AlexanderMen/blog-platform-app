@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Markdown from 'markdown-to-jsx';
 import { connect } from 'react-redux';
 import { useNavigate, useParams, Link } from 'react-router-dom';
@@ -6,23 +6,50 @@ import { Avatar, Popconfirm, Spin, Tag } from 'antd';
 import { HeartOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
 
-import { fetchFullArticle, sendForm, CREATE_ARTICLE } from '../../actions';
+import {
+	fetchFullArticle,
+	deleteArticle,
+	favoriteActicle,
+	unfavoriteActicle,
+	showArticle,
+	ARTICLES_ROUTE,
+} from '../../actions';
+import NotFoundPage from '../NotFoundPage';
+import BlogPlatformService from '../../services/BlogPlatformService';
 
 import classes from './FullArticle.module.scss';
 
-const FullArticle = ({ article, articles, fetchFullArticle, page, sendForm, error }) => {
+const FullArticle = ({
+	article,
+	articles,
+	fetchFullArticle,
+	page,
+	deleteArticle,
+	favoriteActicle,
+	unfavoriteActicle,
+	showArticle,
+	error,
+}) => {
+	const { getItemFromLocalStorage } = new BlogPlatformService();
+
+	useEffect(() => {
+		if (!article || article.slug !== slug) {
+			const isStateHasArticle = articles.length ? articles.find((article) => article.slug === slug) : null;
+			fetchFullArticle(isStateHasArticle, slug, token).then?.((resp) => {
+				if (resp.notFoundPage) showArticle({ notFoundPage: true });
+			});
+		}
+	}, []);
+
 	const { slug } = useParams();
 	const navigate = useNavigate();
-	const loggedIn = localStorage.getItem('loggedIn');
+	const loggedIn = getItemFromLocalStorage('loggedIn');
 	const token = JSON.parse(loggedIn)?.token;
 	let buttons;
 
-	if (!article || article.slug !== slug) {
-		const isStateHasArticle = articles.length ? articles.find((article) => article.slug === slug) : null;
-		fetchFullArticle(isStateHasArticle, slug, token);
-	}
-
 	if (!article && !error) return <Spin size="large" tip="Loading article..." className={classes.spinner} />;
+
+	if (article.notFoundPage) return <NotFoundPage />;
 
 	const { title, description, tagList, favorited, favoritesCount, author, createdAt, body } = article;
 
@@ -40,20 +67,7 @@ const FullArticle = ({ article, articles, fetchFullArticle, page, sendForm, erro
 				<Popconfirm
 					placement="rightTop"
 					description="Are you sure to delete this article?"
-					onConfirm={() => {
-						sendForm(
-							CREATE_ARTICLE,
-							`/articles/${slug}/`,
-							null,
-							'DELETE',
-							page,
-							navigate,
-							'/articles/',
-							null,
-							null,
-							token
-						);
-					}}
+					onConfirm={() => deleteArticle(page, navigate, ARTICLES_ROUTE, slug, token)}
 					onCancel={() => {}}
 					okText="Yes"
 					cancelText="No"
@@ -64,7 +78,7 @@ const FullArticle = ({ article, articles, fetchFullArticle, page, sendForm, erro
 				</Popconfirm>
 				<Link
 					className={`${classes.fullArticle__button} ${classes.fullArticle__button_green}`}
-					to={`/articles/${slug}/edit`}
+					to={`${ARTICLES_ROUTE}${slug}/edit`}
 				>
 					Edit
 				</Link>
@@ -83,20 +97,8 @@ const FullArticle = ({ article, articles, fetchFullArticle, page, sendForm, erro
 							className={`${classes.fullArticle__like} ${favoriteClass}`}
 							onClick={() => {
 								if (!token) return;
-								if (favorited)
-									return sendForm(
-										null,
-										`/articles/${slug}/favorite/`,
-										null,
-										'DELETE',
-										page,
-										null,
-										null,
-										null,
-										slug,
-										token
-									);
-								sendForm(null, `/articles/${slug}/favorite/`, null, 'POST', page, null, null, null, slug, token);
+								if (favorited) return unfavoriteActicle(page, slug, token);
+								favoriteActicle(page, slug, token);
 							}}
 						/>
 						<span className={classes.fullArticle__likesCount}>{favoritesCount}</span>
@@ -127,4 +129,10 @@ const mapStateToProps = ({ changingPage, showingArticle, error }) => ({
 	error: error.err,
 });
 
-export default connect(mapStateToProps, { fetchFullArticle, sendForm })(FullArticle);
+export default connect(mapStateToProps, {
+	fetchFullArticle,
+	deleteArticle,
+	favoriteActicle,
+	unfavoriteActicle,
+	showArticle,
+})(FullArticle);
